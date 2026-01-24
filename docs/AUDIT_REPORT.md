@@ -5,7 +5,7 @@
 > **Network**: Ethereum Sepolia (Live)  
 > **Audit Date**: January 23, 2026  
 > **Last Updated**: January 24, 2026  
-> **Status**: ✅ **BETA** — Live on Sepolia
+> **Status**: ✅ **Live on Testnet**
 
 ---
 
