@@ -2,11 +2,10 @@
 
 > **Version**: 1.0.0 (Pre-Mainnet)  
 > **Vault Address**: `0xC862590209A34927bF61266E7C81878E4909187a`  
-> **Network**: Ethereum Sepolia (Live)  
+> **Network**: Ethereum Testnet (Live)  
 > **Audit Date**: January 23, 2026  
 > **Last Updated**: January 24, 2026  
-> **Status**: ✅ **BETA** — Live on Sepolia
-
+> **Status**: ✅ **Live on Testnet** 
 ---
 
 ## Executive Summary
@@ -97,8 +96,6 @@ The vault fully adheres to the ERC4626 Tokenized Vault Standard, ensuring compat
 ## Recommendations Before Mainnet
 
 1. ⏳ Complete full unit test coverage for `PriceFeedProvider`.
-2. ⏳ Finalize multi-sig ownership on Mainnet.
-3. ⏳ External professional audit.
 
 ---
 

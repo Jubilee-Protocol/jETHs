@@ -10,7 +10,7 @@
 **App**: https://mint.jeths.xyz
 
 **Vault**: `0xC862590209A34927bF61266E7C81878E4909187a`
-**Status**: 🚀 **Beta on Sepolia** — Jan 2026
+**Status**: 🚀 **Live on Testnet** — Jan 2026
 
 ---
 
