@@ -2,12 +2,12 @@
 
 [![Built on Ethereum](https://img.shields.io/badge/Built%20on-Ethereum-3C3C3D)](https://ethereum.org)
 [![Powered by Yearn](https://img.shields.io/badge/Powered%20by-Yearn%20V3-blue)](https://yearn.fi)
-[![Status](https://img.shields.io/badge/Status-Beta%20on%20Sepolia-orange)](https://github.com/Jubilee-Protocol/jETHs)
+[![Status](https://img.shields.io/badge/Status-Testnet-orange)](https://github.com/Jubilee-Protocol/jETHs)
 
 > A passive, diversified liquid staking strategy that automatically rebalances across Ethereum's top LST protocols via Yearn V3 while optimizing for yield.
 
-**Website**: https://jeths.jubilee.xyz
-**App**: Coming Soon
+**Website**: https://jeths.xyz
+**App**: https://mint.jeths.xyz
 
 **Vault**: `0xC862590209A34927bF61266E7C81878E4909187a`
 **Status**: 🚀 **Beta on Sepolia** — Jan 2026
