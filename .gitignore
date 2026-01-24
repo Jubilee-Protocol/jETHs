@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+package-lock.json
+frontend/node_modules/
+frontend/package-lock.json
+
+# Hardhat
+cache/
+cache-zk/
+artifacts/
+artifacts-zk/
+typechain-types/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Build
+dist/
+build/
+frontend/.next/
+
+# Deployment files with secrets
+deployments.json
+*-deployed.json
+
+# Verification
+verify-input.json
+
+# Test coverage
+coverage/
+coverage.json
+
+# Temporary/Logs
+tmp/
+temp/
+*.log
+compile_*.txt
+last_compile_error.txt
+deploy_*.txt
+
+# Old audit files in root (use docs/AUDIT_REPORT.md)
+/audit_report.md
+/audit_report_new.md

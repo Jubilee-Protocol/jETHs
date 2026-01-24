@@ -1,0 +1,23 @@
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+  --> contracts/mocks/MockRouter.sol:18:9:
+   |
+18 |         uint256 deadline
+   |         ^^^^^^^^^^^^^^^^
+
+
+Compiled 44 Solidity files successfully (evm target: cancun).
+
+
+  YearnJETHsStrategy STRESS TESTS
+    ✔ STRESS 1: Market Crash (50% Drop)
+    ✔ STRESS 2: Deposit Cap Enforcement (70ms)
+    ✔ STRESS 3: Oracle Failure (Stale Price)
+
+  YearnJETHsStrategy Deployment
+Deploying with account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Strategy deployed at: 0x3489745eff9525CCC3d8c648102FE2cf3485e228
+    ✔ Should deploy the strategy successfully (170ms)
+
+
+  4 passing (4s)
+

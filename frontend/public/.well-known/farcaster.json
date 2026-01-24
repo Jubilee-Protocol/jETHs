@@ -1,0 +1,42 @@
+{
+    "accountAssociation": {
+        "header": "eyJmaWQiOjIwNzk2MzMsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhCMjQyMkUwZTdlQjk0ZTRGRDg0RDhiN0RBZDg5RDJEMDc5MGI4NzlBIn0",
+        "payload": "eyJkb21haW4iOiJtaW50LmpldGhzLnh5eiJ9",
+        "signature": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEHgaz-5z8qecQa8YROJKQCSr50V_x3oep27WZ_fj6KldF0c4JiS8WoweWo916kNYHjE2JuBaFKr86huT-GgI7ZKGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "frame": {
+        "version": "1",
+        "name": "jETHs",
+        "homeUrl": "https://mint.jeths.xyz",
+        "iconUrl": "https://mint.jeths.xyz/jubilee-logo-pink.png",
+        "splashImageUrl": "https://mint.jeths.xyz/splash.png",
+        "splashBackgroundColor": "#050510"
+    },
+    "miniapp": {
+        "version": "1",
+        "name": "jETHs - Ethereum Index",
+        "subtitle": "Liquid Staked Yield on Ethereum",
+        "description": "The professional Ethereum Index Fund. Diversified exposure to wstETH, cbETH, and rETH with automated rebalancing. Powered by Yearn V3.",
+        "iconUrl": "https://mint.jeths.xyz/jubilee-logo-pink.png",
+        "splashImageUrl": "https://mint.jeths.xyz/splash.png",
+        "splashBackgroundColor": "#050510",
+        "homeUrl": "https://mint.jeths.xyz",
+        "primaryCategory": "finance",
+        "tags": [
+            "ethereum",
+            "defi",
+            "yield",
+            "lst",
+            "vault"
+        ],
+        "heroImageUrl": "https://mint.jeths.xyz/og-image.png",
+        "tagline": "The LST Index Fund",
+        "ogTitle": "jETHs - Ethereum LST Index",
+        "ogDescription": "Earn 4-8% APY from diversified LST exposure",
+        "ogImageUrl": "https://mint.jeths.xyz/og-image.png",
+        "noindex": false,
+        "screenshotUrls": [
+            "https://mint.jeths.xyz/screenshot-1.png"
+        ]
+    }
+}
