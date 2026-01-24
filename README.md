@@ -1,75 +1,126 @@
-# jETHs - The Ethereum Staking Index
+# jETHs - Liquid Staking Index on Ethereum
 
-A passive, diversified liquid staking strategy that automatically rebalances across Ethereum's top LST protocols (wstETH, cbETH, rETH) while optimizing for yield and liquidity.
+[![Built on Ethereum](https://img.shields.io/badge/Built%20on-Ethereum-3C3C3D)](https://ethereum.org)
+[![Powered by Yearn](https://img.shields.io/badge/Powered%20by-Yearn%20V3-blue)](https://yearn.fi)
+[![Status](https://img.shields.io/badge/Status-Beta%20on%20Sepolia-orange)](https://github.com/Jubilee-Protocol/jETHs)
 
-**Website:** [https://mint.jeths.xyz](https://mint.jeths.xyz)  
-**Status:** 🚀 Live on Sepolia Testnet — Jan 2026
+> A passive, diversified liquid staking strategy that automatically rebalances across Ethereum's top LST protocols via Yearn V3 while optimizing for yield.
 
-```text
-0x627EEA... (Vault Address)
-```
+**Website**: https://jeths.jubilee.xyz
+**App**: Coming Soon
+
+**Vault**: `0xC862590209A34927bF61266E7C81878E4909187a`
+**Status**: 🚀 **Beta on Sepolia** — Jan 2026
+
+---
 
 ## Overview
 
-jETHs (Jubilee Ethereum Staking Index) provides one-click exposure to a curated basket of Liquid Staking Tokens. By holding jETHs, users earn diversified staking rewards while benefiting from automated risk management and rebalancing.
+jETHs aggregates user deposits across multiple Liquid Staking Token (LST) protocols on Ethereum, automatically rebalancing to optimize yield using Yearn V3 strategies. Users deposit WETH/ETH and receive jETHs shares representing their proportional ownership.
 
 ### Key Features
 
-- **Automated Rebalancing**: Maintaining target allocations across wstETH, cbETH, and rETH.
-- **Optimized Yield**: Sophisticated strategy to capture peak APY across integrated protocols.
-- **Liquidity Focused**: Built on top of high-liquidity LSTs to ensure smooth entry and exit.
-- **One-Click Minting**: Deposit WETH and receive jETHs index tokens instantly.
+- **Passive Strategy** - Deposit ETH/WETH, earn optimized staking rewards.
+- **Diversified** - Spread across wstETH, cbETH, and rETH.
+- **Auto-Rebalancing** - Adjusts allocations based on Yearn V3 performance.
+- **Secure** - Circuit breakers, multi-sig governance, and Yearn's battle-tested infrastructure.
+
+---
 
 ## Target Allocations
 
-| Protocol | Target | Asset |
-| :--- | :--- | :--- |
-| **Lido** | 40% | wstETH |
-| **Coinbase** | 35% | cbETH |
-| **Rocket Pool** | 25% | rETH |
+| Protocol | Allocation | Token | Est. APY |
+|----------|------------|-------|----------|
+| Lido | 33.3% | wstETH | ~3.8% |
+| Coinbase | 33.3% | cbETH | ~3.5% |
+| RocketPool | 33.4% | rETH | ~3.6% |
+
+**Target Blended APY**: 3.5-5.0% (Before Yearn boosting)
+
+---
+
+## Fee Structure
+
+| Fee Type | Rate | Max Allowed |
+|----------|------|-------------|
+| Management Fee | 0.0% | 1.0% |
+| Performance Fee | 10% of gains | 20% |
+
+---
 
 ## Security
 
-- **Non-Custodial**: Users always retain control of their funds through Jubilee's smart contract architecture.
-- **Audited**: Contract audited by [Audit Report](https://github.com/Jubilee-Protocol/jETHs-on-Base/blob/main/docs/JETHS_AUDIT_REPORT.md).
-- **Battle-Tested**: Built using the same core infrastructure as [jBTCi](https://jbtci.xyz) and [jSOLi](https://jsoli.xyz).
+- **Features**:
+  - ✅ Solidity 0.8.20+ with SafeMath standards.
+  - ✅ Role-based access control (AccessControl).
+  - ✅ Emergency pause mechanism.
+  - ✅ Slippage protection via Yearn V3 Router.
+  - ✅ Diversified exposure to mitigate individual LST de-pegging.
+
+---
 
 ## Repository Structure
-
-```text
+```
 jETHs/
-├── contracts/        # Solidity smart contracts (ERC-4626)
-├── frontend/         # Next.js web application
-├── scripts/          # Deployment and maintenance scripts
-└── docs/             # Technical documentation & audits
+├── contracts/
+│   ├── vaults/jETHs/
+│   │   └── JETHsVault.sol      # Main Index Vault (ERC4626)
+│   ├── strategies/
+│   │   └── YearnJETHsStrategy.sol # Yearn V3 Strategy integration
+│   └── interfaces/             # LST & Yearn interfaces
+├── frontend/                   # Next.js / RainbowKit application
+├── tests/                      # Foundry/Hardhat test suite
+└── scripts/                    # Deployment & management scripts
 ```
 
+---
+
 ## Quick Start
-
-### Prerequisites
-
-- Node.js (v18+)
-- Foundry (for contract testing)
-
-### Installation
 
 ```bash
 # Clone the repository
 git clone https://github.com/Jubilee-Protocol/jETHs
 cd jETHs
 
-# Install frontend dependencies
-cd frontend
+# Install dependencies
 npm install
 
-# Start development server
-npm run dev
+# Build contracts
+npx hardhat compile
+
+# Run tests
+npx hardhat test
 ```
+
+---
+
+## How It Works
+
+### Deposit Flow
+1. User deposits ETH/WETH into the `JETHsVault`.
+2. Vault calculates shares based on current TVL.
+3. jETHs tokens are minted to the user.
+4. Assets are deployed to Yearn V3 LST strategies.
+
+### Withdrawal Flow
+1. User requests withdrawal/redeem with jETHs shares.
+2. Vault pulls assets from Yearn strategies.
+3. jETHs is burned, original assets returned to user.
+
+### Rebalancing
+- Leverages Yearn V3's dynamic allocation.
+- Triggered periodically by Jubilee keepers to maintain target index weightings.
+
+---
 
 ## Built By
 
-Developed by **Jubilee Labs** and governed by the **Hundredfold Foundation**.
+**[Jubilee Labs](https://jubilee.xyz)** • Powered by **[Yearn Finance](https://yearn.fi)** • Deployed on **[Ethereum](https://ethereum.org)**
 
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+*"Seek first the Kingdom of God!"* — Matthew 6:33

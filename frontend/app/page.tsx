@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { formatUnits, parseUnits } from 'viem';
 import { CONTRACTS } from '../config';
 import { useIsMiniApp, useMiniAppReady } from './hooks/useMiniApp';
+import { useTheme } from './providers';
 
 // Min deposit constant
 const MIN_DEPOSIT_ETH = 0.01;
@@ -121,6 +122,8 @@ export default function Home() {
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'pending' } | null>(null);
     const [showHistory, setShowHistory] = useState(false);
     const [txHistory, setTxHistory] = useState<TxHistoryItem[]>([]);
+    const [showTreasuryModal, setShowTreasuryModal] = useState(false);
+    const { theme, toggleTheme } = useTheme();
 
     const isMiniApp = useIsMiniApp();
     useMiniAppReady();
@@ -258,16 +261,41 @@ export default function Home() {
                 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
             `}</style>
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+            {showTreasuryModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+                    <div className="card" style={{ maxWidth: '400px', width: '100%', padding: '40px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '40px', marginBottom: '16px' }}>🏛️</div>
+                        <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>Treasury Mode</h2>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px', lineHeight: '1.5' }}>
+                            Organizational Accountability with Multi-Sig Wallets. Connect your Safe to manage jETHs assets.
+                        </p>
+                        <div className="space-y-3">
+                            <a href="https://safe.global" target="_blank" className="btn-blue w-full block text-center" style={{ textDecoration: 'none' }}>Create New Safe Wallet</a>
+                            <button onClick={() => setShowTreasuryModal(false)} className="btn-secondary w-full" style={{ background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-primary)' }}>I Already Have a Safe</button>
+                        </div>
+                        <button onClick={() => setShowTreasuryModal(false)} style={{ marginTop: '20px', background: 'none', border: 'none', color: '#0052FF', fontWeight: '600', cursor: 'pointer' }}>Close</button>
+                    </div>
+                </div>
+            )}
             <main style={getGradientStyle()} className="flex flex-col bg-vignette">
                 <header style={{ padding: '24px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                         <Image src="/jubilee-logo-pink.png" alt="logo" width={42} height={42} />
-                        <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#1A1A1A' }}>jETHs</span>
+                        <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)' }}>jETHs</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="hidden sm:flex gap-3 mr-4">
                             <a href="https://twitter.com/jubileeprotocol" target="_blank" rel="noopener noreferrer" className="social-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg></a>
-                            <a href="https://warpcast.com/jubilee" target="_blank" rel="noopener noreferrer" className="social-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.2 12.8c0-5.4-4.5-9.8-10.1-9.8S3 7.4 3 12.8c0 3.7 2 6.9 5 8.7L5.5 24h15l-2.5-2.5c3-1.8 5.2-5 5.2-8.7z" /></svg></a>
+                            <a href="https://warpcast.com/jubilee" target="_blank" rel="noopener noreferrer" className="social-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.2 12.8c0-5.4-4.5-9.8-10.1-9.8S3 7.4 3 12.8c0 3.7(2 6.9 5 8.7L5.5 24h15l-2.5-2.5c3-1.8 5.2-5 5.2-8.7z" /></svg></a>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginRight: '8px' }}>
+                            <button onClick={toggleTheme} className="header-btn" title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+                                {theme === 'light' ? '🌙' : '☀️'}
+                            </button>
+                            <button onClick={() => setShowTreasuryModal(true)} className="header-btn" title="Treasury Mode for Organizations">
+                                🏛️
+                            </button>
                         </div>
                         <ConnectButton />
                     </div>
@@ -283,7 +311,7 @@ export default function Home() {
                                 <button onClick={() => setActiveTab('withdraw')} className={`tab-btn ${activeTab === 'withdraw' ? 'active' : ''}`} style={{ position: 'relative' }}>
                                     Withdraw {activeTab === 'withdraw' && <div className="absolute -bottom-[13px] left-0 right-0 h-0.5 bg-[#0052FF]" />}
                                 </button>
-                                {isConnected && <button onClick={() => setShowHistory(!showHistory)} className="ml-auto text-xs font-bold text-black/20 uppercase tracking-widest hover:text-black transition-colors">History</button>}
+                                {isConnected && <button onClick={() => setShowHistory(!showHistory)} className="ml-auto text-xs font-bold text-[#9CA3AF] uppercase tracking-widest hover:text-black transition-colors">History</button>}
                             </div>
 
                             <div className="space-y-6">
@@ -293,12 +321,12 @@ export default function Home() {
                                         <span>Balance: {activeTab === 'deposit' ? (wethBalance ? parseFloat(formatUnits(wethBalance, 18)).toFixed(2) : '0.00') : (jETHsBalance ? parseFloat(formatUnits(jETHsBalance, 18)).toFixed(2) : '0.00')}</span>
                                     </div>
                                     <div className="flex items-center justify-between gap-4">
-                                        <input type="text" placeholder="0" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} className="text-[28px] font-semibold bg-transparent outline-none w-full text-[#1A1A1A]" />
+                                        <input type="text" placeholder="0" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} className="text-[28px] font-semibold bg-transparent outline-none w-full text-inherit" />
                                         <div className="flex items-center gap-2">
                                             <button onClick={() => setDepositAmount(activeTab === 'deposit' ? (wethBalance ? formatUnits(wethBalance, 18) : '0') : (jETHsBalance ? formatUnits(jETHsBalance, 18) : '0'))} className="text-[12px] font-semibold text-[#0052FF] hover:opacity-70 transition-opacity">Max</button>
-                                            <div className="flex items-center gap-2 bg-[#F0F2F5] rounded-full px-3 py-1.5">
+                                            <div className="flex items-center gap-2 bg-[#F0F2F5] dark:bg-white/5 rounded-full px-3 py-1.5">
                                                 <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${activeTab === 'deposit' ? 'bg-[#0052FF]' : 'bg-[#F377BB]'}`}>{activeTab === 'deposit' ? 'W' : 'j'}</div>
-                                                <span className="text-sm font-semibold text-[#1A1A1A]">{activeTab === 'deposit' ? 'cbWETH' : 'jETHs'}</span>
+                                                <span className="text-sm font-semibold">{activeTab === 'deposit' ? 'cbWETH' : 'jETHs'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -308,7 +336,7 @@ export default function Home() {
                                 </div>
 
                                 <div className="flex justify-center -my-9 relative z-10">
-                                    <div className="bg-white border border-black/5 rounded-full p-2.5 shadow-lg text-[#0052FF] cursor-pointer hover:scale-110 transition-transform">
+                                    <div className="bg-white dark:bg-[#151525] border border-black/5 dark:border-white/10 rounded-full p-2.5 shadow-lg text-[#0052FF] cursor-pointer hover:scale-110 transition-transform">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5V19M19 12l-7 7-7-7" /></svg>
                                     </div>
                                 </div>
@@ -316,10 +344,10 @@ export default function Home() {
                                 <div className="input-container">
                                     <div className="text-[13px] font-medium text-[#666666] mb-3">You receive</div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[28px] font-semibold text-[#1A1A1A]">{depositAmount || '0'}</span>
-                                        <div className="flex items-center gap-2 bg-[#F0F2F5] rounded-full px-3 py-1.5">
+                                        <span className="text-[28px] font-semibold">{depositAmount || '0'}</span>
+                                        <div className="flex items-center gap-2 bg-[#F0F2F5] dark:bg-white/5 rounded-full px-3 py-1.5">
                                             <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${activeTab === 'deposit' ? 'bg-[#F377BB]' : 'bg-[#0052FF]'}`}>{activeTab === 'deposit' ? 'j' : 'W'}</div>
-                                            <span className="text-sm font-semibold text-[#1A1A1A]">{activeTab === 'deposit' ? 'jETHs' : 'cbWETH'}</span>
+                                            <span className="text-sm font-semibold">{activeTab === 'deposit' ? 'jETHs' : 'cbWETH'}</span>
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center mt-3 text-[13px] text-[#666666]">
@@ -342,7 +370,7 @@ export default function Home() {
                         <div className="mt-8 grid grid-cols-2 gap-4">
                             <div className="card p-6 text-center">
                                 <div className="text-[12px] font-medium text-[#666666] uppercase tracking-wider mb-1">Total Value Locked</div>
-                                <div className="text-[20px] font-bold text-[#1A1A1A]">{totalHoldings.toFixed(2)} ETH</div>
+                                <div className="text-[20px] font-bold">{totalHoldings.toFixed(2)} ETH</div>
                                 <div className="text-[12px] font-semibold text-[#10B981] mt-1">Growth: +1.2%</div>
                             </div>
                             <div className="card p-6 text-center">
@@ -356,7 +384,7 @@ export default function Home() {
                             {[['wstETH', wstPercent], ['cbETH', cbethPercent], ['rETH', rethPercent]].map(([name, p], i) => (
                                 <div key={i} className="flex flex-col items-center">
                                     <span className="text-[11px] font-medium text-[#666666] uppercase tracking-wider mb-1">{name as string}</span>
-                                    <span className="text-[14px] font-bold text-[#1A1A1A]">{(p as number).toFixed(1)}%</span>
+                                    <span className="text-[14px] font-bold">{(p as number).toFixed(1)}%</span>
                                 </div>
                             ))}
                         </div>
