@@ -4,15 +4,16 @@
 /* jETHs Design System - jBTCi Parity */
 :root {
   --eth-blue: #627EEA;
-  --eth-dark: #0052FF;
-  --bg-primary: #050505;
-  --bg-card: #111111;
-  --bg-input: rgba(0, 0, 0, 0.4);
-  --border-color: rgba(255, 255, 255, 0.1);
+  --bg-primary: #000000;
+  --bg-card: #0a0a0a;
+  --bg-input: #111111;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-accent: rgba(98, 126, 234, 0.2);
   --text-primary: #FFFFFF;
   --text-secondary: #9CA3AF;
   --text-muted: #6B7280;
   --success: #10B981;
+  --warning: #F59E0B;
   --pink: #F377BB;
 }
 
@@ -22,6 +23,7 @@
   margin: 0;
 }
 
+html,
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -30,22 +32,15 @@ body {
   min-height: 100vh;
 }
 
+/* Override RainbowKit button styles */
+[data-rk] {
+  --rk-radii-connectButton: 12px;
+}
+
 /* Animations */
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
   }
 }
 
@@ -57,12 +52,8 @@ body {
   }
 
   50% {
-    opacity: 0.5;
+    opacity: 0.6;
   }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Custom Scrollbar */
@@ -81,4 +72,15 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Input number spin buttons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
