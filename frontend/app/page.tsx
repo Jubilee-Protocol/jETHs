@@ -242,8 +242,8 @@ export default function Home() {
                         </div>
                         <nav className="hidden sm:flex items-center gap-6 text-sm text-gray-400">
                             <span className="text-white font-medium border-b-2 border-[#627EEA] pb-1">Vault</span>
-                            <a href={`https://sepolia.etherscan.io/address/${vaultAddress}`} target="_blank" className="hover:text-white transition-colors">Contract</a>
-                            <a href="https://docs.jubilee.fi" target="_blank" className="hover:text-white transition-colors">Docs</a>
+                            <a href={`https://sepolia.etherscan.io/address/0x27143095013184e718f92330C32A3D2eE9974053`} target="_blank" className="hover:text-white transition-colors">Contract</a>
+                            <a href="https://github.com/Jubilee-Protocol/jETHs#readme" target="_blank" className="hover:text-white transition-colors">Docs</a>
                         </nav>
                     </div>
                     <div className="flex items-center gap-3">
@@ -396,10 +396,10 @@ export default function Home() {
 
                     {/* Footer Links */}
                     <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm">
-                        <a href={`https://sepolia.etherscan.io/address/${vaultAddress}`} target="_blank" className="text-gray-500 hover:text-white transition-colors">Contract ↗</a>
+                        <a href={`https://sepolia.etherscan.io/address/0x27143095013184e718f92330C32A3D2eE9974053`} target="_blank" className="text-gray-500 hover:text-white transition-colors">Contract ↗</a>
                         <a href="https://github.com/Jubilee-Protocol/jETHs/blob/main/docs/AUDIT_REPORT.md" target="_blank" className="text-gray-500 hover:text-white transition-colors">Audit ↗</a>
                         <a href="https://github.com/Jubilee-Protocol/jETHs#readme" target="_blank" className="text-gray-500 hover:text-white transition-colors">Docs ↗</a>
-                        <a href="https://jubilee.fi" target="_blank" className="text-gray-500 hover:text-white transition-colors">Jubilee ↗</a>
+                        <a href="https://jubileeprotocol.xyz" target="_blank" className="text-gray-500 hover:text-white transition-colors">Jubilee ↗</a>
                     </div>
 
                     {/* Copyright */}
