@@ -3,14 +3,11 @@
 import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useReadContract, useWriteContract, useChainId, useWaitForTransactionReceipt, useConnect } from 'wagmi';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { formatUnits, parseUnits } from 'viem';
 import { CONTRACTS } from '../config';
 import { useIsMiniApp, useMiniAppReady } from './hooks/useMiniApp';
 import { useTheme } from './providers';
-
-// Min deposit constant
-const MIN_DEPOSIT_ETH = 0.01;
 
 // Strategy ABI
 const STRATEGY_ABI = [
@@ -84,12 +81,6 @@ const ERC20_ABI = [
     { name: 'approve', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [{ type: 'bool' }] },
 ] as const;
 
-const getGradientStyle = () => ({
-    background: 'var(--eth-bg)',
-    minHeight: '100vh',
-    color: 'var(--text-primary)'
-});
-
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error' | 'pending'; onClose: () => void }) {
     useEffect(() => {
         if (type !== 'pending') {
@@ -120,10 +111,7 @@ export default function Home() {
     const [rememberDevice, setRememberDevice] = useState(false);
     const [ethPrice, setEthPrice] = useState(2500);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'pending' } | null>(null);
-    const [showHistory, setShowHistory] = useState(false);
     const [txHistory, setTxHistory] = useState<TxHistoryItem[]>([]);
-    const [showTreasuryModal, setShowTreasuryModal] = useState(false);
-    const { theme, toggleTheme } = useTheme();
 
     const isMiniApp = useIsMiniApp();
     useMiniAppReady();
@@ -175,13 +163,12 @@ export default function Home() {
     const vaultAddress = contracts.vault as `0x${string}`;
     const wethAddress = contracts.weth as `0x${string}`;
 
-    const { data: strategyStatus, refetch: refetchStatus } = useReadContract({ address: strategyAddress, abi: STRATEGY_ABI, functionName: 'getStrategyStatus' });
-    const { data: wethBalance, refetch: refetchWETH } = useReadContract({ address: wethAddress, abi: ERC20_ABI, functionName: 'balanceOf', args: address ? [address] : undefined });
-    const { data: jETHsBalance, refetch: refetchJETHs } = useReadContract({ address: vaultAddress, abi: ERC20_ABI, functionName: 'balanceOf', args: address ? [address] : undefined });
-    const { data: allowance, refetch: refetchAllowance } = useReadContract({ address: wethAddress, abi: ERC20_ABI, functionName: 'allowance', args: address ? [address, vaultAddress] : undefined });
+    const { data: strategyStatus } = useReadContract({ address: strategyAddress, abi: STRATEGY_ABI, functionName: 'getStrategyStatus' });
+    const { data: wethBalance } = useReadContract({ address: wethAddress, abi: ERC20_ABI, functionName: 'balanceOf', args: address ? [address] : undefined });
+    const { data: jETHsBalance } = useReadContract({ address: vaultAddress, abi: ERC20_ABI, functionName: 'balanceOf', args: address ? [address] : undefined });
+    const { data: allowance } = useReadContract({ address: wethAddress, abi: ERC20_ABI, functionName: 'allowance', args: address ? [address, vaultAddress] : undefined });
     const { data: shareRatio } = useReadContract({ address: strategyAddress, abi: STRATEGY_ABI, functionName: 'convertToAssets', args: [BigInt(1e18)] });
 
-    const shareRatioDisplay = shareRatio ? (Number(formatUnits(shareRatio, 18))).toFixed(6) : '1.000000';
     const totalHoldings = strategyStatus ? Number(formatUnits(strategyStatus.totalHoldings, 18)) : 0;
     const wstPercent = strategyStatus ? Number(strategyStatus.allocs.wsteth) / 100 : 40;
     const cbethPercent = strategyStatus ? Number(strategyStatus.allocs.cbeth) / 100 : 35;
@@ -213,42 +200,29 @@ export default function Home() {
         if (remembered === 'true') { setHasAcceptedTerms(true); setShowTermsModal(false); }
     }, []);
 
+    // Terms Modal
     if (showTermsModal && !hasAcceptedTerms) {
         return (
-            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
-                <div style={{ background: 'white', borderRadius: '32px', maxWidth: '500px', width: '100%', padding: '40px', boxShadow: '0 25px 70px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-                        <Image src="/jubilee-logo-pink.png" alt="Jubilee" width={40} height={40} />
-                        <span style={{ fontSize: '16px', fontWeight: '400', color: '#1A1A1A' }}>jETHs</span>
+            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-5">
+                <div className="bg-[#111] border border-white/10 rounded-2xl max-w-[420px] w-full p-8 text-center">
+                    <Image src="/jubilee-logo-pink.png" alt="Jubilee" width={48} height={48} className="mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-white mb-2">jETHs Terms of Use</h2>
+                    <div className="bg-black/40 rounded-xl p-4 text-left text-sm text-gray-400 max-h-[250px] overflow-y-auto mb-6 border border-white/5">
+                        <p className="mb-3">By using jETHs, a product of Jubilee Protocol governed by Hundredfold Foundation, you acknowledge:</p>
+                        <p className="mb-2"><span className="text-[#627EEA] font-medium">(a)</span> jETHs is provided "AS-IS" without warranties.</p>
+                        <p className="mb-2"><span className="text-[#627EEA] font-medium">(b)</span> DeFi protocols carry significant risks including smart contract vulnerabilities and market volatility.</p>
+                        <p><span className="text-[#627EEA] font-medium">(c)</span> You are solely responsible for your investment decisions.</p>
                     </div>
-                    <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#0052FF', marginBottom: '24px' }}>Terms of Use</h2>
-                    <div style={{ background: '#F8F9FA', borderRadius: '20px', padding: '24px', textAlign: 'left', fontSize: '13px', lineHeight: '1.6', color: '#666666', maxHeight: '300px', overflowY: 'auto', marginBottom: '24px', border: '1px solid rgba(0, 82, 255, 0.05)' }}>
-                        <p style={{ marginBottom: '16px', fontWeight: '600', color: '#1A1A1A' }}>
-                            By using jETHs, a product of Jubilee Protocol governed by Hundredfold Foundation and developed by Jubilee Labs, you acknowledge and agree:
-                        </p>
-                        <p style={{ marginBottom: '14px' }}>
-                            <strong style={{ color: '#0052FF' }}>(a)</strong> jETHs is provided on an &quot;AS-IS&quot; and &quot;AS AVAILABLE&quot; basis. Hundredfold Foundation, Jubilee Labs, and their affiliates expressly disclaim all representations, warranties, and conditions of any kind, whether express, implied, or statutory.
-                        </p>
-                        <p style={{ marginBottom: '14px' }}>
-                            <strong style={{ color: '#0052FF' }}>(b)</strong> Neither Hundredfold Foundation nor Jubilee Labs makes any warranty that jETHs will meet your requirements, be available on an uninterrupted, timely, secure, or error-free basis, or be accurate, reliable, or free of harmful code.
-                        </p>
-                        <p style={{ marginBottom: '14px' }}>
-                            <strong style={{ color: '#0052FF' }}>(c)</strong> You shall have no claim against Hundredfold Foundation, Jubilee Labs, or their affiliates for any loss arising from your use of jETHs or Jubilee Protocol products.
-                        </p>
-                        <p style={{ marginBottom: '14px' }}>
-                            <strong style={{ color: '#0052FF' }}>(d)</strong> DeFi protocols carry significant risks including: smart contract vulnerabilities, market volatility, oracle failures, and potential total loss of deposited funds.
-                        </p>
-                        <p>
-                            <strong style={{ color: '#0052FF' }}>(e)</strong> This is not financial, legal, or tax advice. You are solely responsible for your own investment decisions and due diligence.
-                        </p>
-                    </div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center', marginBottom: '24px', cursor: 'pointer', fontSize: '14px', color: '#666666' }}>
-                        <input type="checkbox" checked={rememberDevice} onChange={e => setRememberDevice(e.target.checked)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} /> Remember this device
+                    <label className="flex items-center gap-2 justify-center mb-6 text-sm text-gray-500 cursor-pointer">
+                        <input type="checkbox" checked={rememberDevice} onChange={e => setRememberDevice(e.target.checked)} className="w-4 h-4" />
+                        Remember this device
                     </label>
-                    <button onClick={() => { if (rememberDevice) localStorage.setItem('jeths-terms-remembered', 'true'); setHasAcceptedTerms(true); setShowTermsModal(false); }} className="btn-blue w-full">I Understand & Accept</button>
-                    <div style={{ marginTop: '16px', fontSize: '11px', color: '#9CA3AF' }}>
-                        By clicking Accept, you agree to the Jubilee Protocol Terms of Service
-                    </div>
+                    <button
+                        onClick={() => { if (rememberDevice) localStorage.setItem('jeths-terms-remembered', 'true'); setHasAcceptedTerms(true); setShowTermsModal(false); }}
+                        className="w-full py-4 bg-gradient-to-r from-[#627EEA] to-[#0052FF] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                    >
+                        I Understand & Accept
+                    </button>
                 </div>
             </div>
         );
@@ -259,149 +233,186 @@ export default function Home() {
             <style jsx global>{`
                 @keyframes spin { to { transform: rotate(360deg); } }
                 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
             `}</style>
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-            {showTreasuryModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
-                    <div className="card" style={{ maxWidth: '400px', width: '100%', padding: '40px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '40px', marginBottom: '16px' }}>🏛️</div>
-                        <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>Treasury Mode</h2>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '24px', lineHeight: '1.5' }}>
-                            Organizational Accountability with Multi-Sig Wallets. Connect your Safe to manage jETHs assets.
-                        </p>
-                        <div className="space-y-3">
-                            <a href="https://safe.global" target="_blank" className="btn-blue w-full block text-center" style={{ textDecoration: 'none' }}>Create New Safe Wallet</a>
-                            <button onClick={() => setShowTreasuryModal(false)} className="btn-secondary w-full" style={{ background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-primary)' }}>I Already Have a Safe</button>
-                        </div>
-                        <button onClick={() => setShowTreasuryModal(false)} style={{ marginTop: '20px', background: 'none', border: 'none', color: '#0052FF', fontWeight: '600', cursor: 'pointer' }}>Close</button>
-                    </div>
+            <main className="min-h-screen bg-[#050505] text-white flex flex-col">
+                {/* Hero Header */}
+                <div className="text-center pt-16 pb-8">
+                    <Image src="/jubilee-logo-pink.png" alt="jETHs" width={64} height={64} className="mx-auto mb-4" />
+                    <h1 className="text-4xl md:text-5xl font-bold mb-2">
+                        <span className="text-[#627EEA]">The Ethereum</span><br />
+                        <span className="text-white">Staking Index</span>
+                    </h1>
+                    <p className="text-gray-400 text-lg">Earn <span className="text-[#10B981] font-semibold">7-11% APY</span> on your ETH</p>
                 </div>
-            )}
-            <main style={getGradientStyle()} className="flex flex-col bg-vignette">
-                <header style={{ padding: '24px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        <Image src="/jubilee-logo-pink.png" alt="logo" width={42} height={42} />
-                        <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)' }}>jETHs</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex gap-3 mr-4">
-                            <a href="https://twitter.com/jubileeprotocol" target="_blank" rel="noopener noreferrer" className="social-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg></a>
-                            <a href="https://warpcast.com/jubilee" target="_blank" rel="noopener noreferrer" className="social-icon"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.2 12.8c0-5.4-4.5-9.8-10.1-9.8S3 7.4 3 12.8c0 3.7(2 6.9 5 8.7L5.5 24h15l-2.5-2.5c3-1.8 5.2-5 5.2-8.7z" /></svg></a>
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px', marginRight: '8px' }}>
-                            <button onClick={toggleTheme} className="header-btn" title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
-                                {theme === 'light' ? '🌙' : '☀️'}
-                            </button>
-                            <button onClick={() => setShowTreasuryModal(true)} className="header-btn" title="Treasury Mode for Organizations">
-                                🏛️
-                            </button>
-                        </div>
-                        <ConnectButton />
-                    </div>
-                </header>
 
-                <div className="flex-1 flex flex-col items-center justify-center p-6">
-                    <div className="w-full max-w-[480px]">
-                        <div className="card p-8">
-                            <div className="flex gap-8 mb-8 border-b border-black/5 pb-3">
-                                <button onClick={() => setActiveTab('deposit')} className={`tab-btn ${activeTab === 'deposit' ? 'active' : ''}`} style={{ position: 'relative' }}>
-                                    Deposit {activeTab === 'deposit' && <div className="absolute -bottom-[13px] left-0 right-0 h-0.5 bg-[#0052FF]" />}
-                                </button>
-                                <button onClick={() => setActiveTab('withdraw')} className={`tab-btn ${activeTab === 'withdraw' ? 'active' : ''}`} style={{ position: 'relative' }}>
-                                    Withdraw {activeTab === 'withdraw' && <div className="absolute -bottom-[13px] left-0 right-0 h-0.5 bg-[#0052FF]" />}
-                                </button>
-                                {isConnected && <button onClick={() => setShowHistory(!showHistory)} className="ml-auto text-xs font-bold text-[#9CA3AF] uppercase tracking-widest hover:text-black transition-colors">History</button>}
+                {/* Main Card */}
+                <div className="flex-1 flex items-start justify-center px-4 pb-8">
+                    <div className="w-full max-w-[420px]">
+                        <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
+                            {/* TVL & APY Row */}
+                            <div className="flex justify-between items-center mb-6 text-sm">
+                                <div>
+                                    <span className="text-gray-500 uppercase text-xs tracking-wider">TVL</span>
+                                    <div className="text-white font-bold">{totalHoldings.toFixed(4)} ETH</div>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-gray-500 uppercase text-xs tracking-wider">Target APY</span>
+                                    <div className="text-[#10B981] font-bold">7-11%</div>
+                                </div>
                             </div>
 
-                            <div className="space-y-6">
-                                <div className="input-container">
-                                    <div className="flex justify-between text-[13px] font-medium text-[#666666] mb-3">
+                            {/* Asset Composition */}
+                            <div className="flex items-center justify-center gap-3 mb-6">
+                                <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-full px-4 py-2">
+                                    <div className="w-6 h-6 rounded-full bg-[#627EEA] flex items-center justify-center text-xs font-bold">W</div>
+                                    <span className="text-sm font-medium">wstETH</span>
+                                    <span className="text-gray-500 text-sm">{wstPercent.toFixed(0)}%</span>
+                                </div>
+                                <span className="text-gray-600">+</span>
+                                <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-full px-4 py-2">
+                                    <div className="w-6 h-6 rounded-full bg-[#0052FF] flex items-center justify-center text-xs font-bold">cb</div>
+                                    <span className="text-sm font-medium">cbETH</span>
+                                    <span className="text-gray-500 text-sm">{cbethPercent.toFixed(0)}%</span>
+                                </div>
+                                <span className="text-gray-600">+</span>
+                                <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-full px-4 py-2">
+                                    <div className="w-6 h-6 rounded-full bg-[#FF6B6B] flex items-center justify-center text-xs font-bold">R</div>
+                                    <span className="text-sm font-medium">rETH</span>
+                                    <span className="text-gray-500 text-sm">{rethPercent.toFixed(0)}%</span>
+                                </div>
+                            </div>
+
+                            {/* Tabs */}
+                            <div className="flex gap-6 mb-4 border-b border-white/10 pb-2">
+                                <button onClick={() => setActiveTab('deposit')} className={`text-sm font-semibold pb-2 border-b-2 transition-colors ${activeTab === 'deposit' ? 'text-[#627EEA] border-[#627EEA]' : 'text-gray-500 border-transparent hover:text-white'}`}>
+                                    Deposit
+                                </button>
+                                <button onClick={() => setActiveTab('withdraw')} className={`text-sm font-semibold pb-2 border-b-2 transition-colors ${activeTab === 'withdraw' ? 'text-[#627EEA] border-[#627EEA]' : 'text-gray-500 border-transparent hover:text-white'}`}>
+                                    Withdraw
+                                </button>
+                            </div>
+
+                            {/* Input Section */}
+                            <div className="space-y-4">
+                                <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                                    <div className="flex justify-between text-xs text-gray-500 mb-2">
                                         <span>You {activeTab}</span>
-                                        <span>Balance: {activeTab === 'deposit' ? (wethBalance ? parseFloat(formatUnits(wethBalance, 18)).toFixed(2) : '0.00') : (jETHsBalance ? parseFloat(formatUnits(jETHsBalance, 18)).toFixed(2) : '0.00')}</span>
+                                        <span>Balance: {activeTab === 'deposit' ? (wethBalance ? parseFloat(formatUnits(wethBalance, 18)).toFixed(4) : '0.00') : (jETHsBalance ? parseFloat(formatUnits(jETHsBalance, 18)).toFixed(4) : '0.00')}</span>
                                     </div>
-                                    <div className="flex items-center justify-between gap-4">
-                                        <input type="text" placeholder="0" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} className="text-[28px] font-semibold bg-transparent outline-none w-full text-inherit" />
+                                    <div className="flex items-center justify-between">
+                                        <input
+                                            type="text"
+                                            placeholder="0"
+                                            value={depositAmount}
+                                            onChange={e => setDepositAmount(e.target.value)}
+                                            className="text-2xl font-semibold bg-transparent outline-none w-full text-white"
+                                        />
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => setDepositAmount(activeTab === 'deposit' ? (wethBalance ? formatUnits(wethBalance, 18) : '0') : (jETHsBalance ? formatUnits(jETHsBalance, 18) : '0'))} className="text-[12px] font-semibold text-[#0052FF] hover:opacity-70 transition-opacity">Max</button>
-                                            <div className="flex items-center gap-2 bg-[#F0F2F5] dark:bg-white/5 rounded-full px-3 py-1.5">
-                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${activeTab === 'deposit' ? 'bg-[#0052FF]' : 'bg-[#F377BB]'}`}>{activeTab === 'deposit' ? 'W' : 'j'}</div>
-                                                <span className="text-sm font-semibold">{activeTab === 'deposit' ? 'cbWETH' : 'jETHs'}</span>
+                                            <button onClick={() => setDepositAmount(activeTab === 'deposit' ? (wethBalance ? formatUnits(wethBalance, 18) : '0') : (jETHsBalance ? formatUnits(jETHsBalance, 18) : '0'))} className="text-xs font-semibold text-[#627EEA] hover:opacity-70">Max</button>
+                                            <div className="flex items-center gap-1.5 bg-white/5 rounded-full px-3 py-1.5">
+                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${activeTab === 'deposit' ? 'bg-[#627EEA]' : 'bg-[#F377BB]'}`}>
+                                                    {activeTab === 'deposit' ? 'Ξ' : 'j'}
+                                                </div>
+                                                <span className="text-sm font-medium">{activeTab === 'deposit' ? 'WETH' : 'jETHs'}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[13px] text-[#666666]">
-                                        ≈ ${depositUsdValue.toLocaleString()}
+                                    <div className="text-xs text-gray-500 mt-1">≈ ${depositUsdValue.toLocaleString()}</div>
+                                </div>
+
+                                {/* Arrow */}
+                                <div className="flex justify-center -my-2">
+                                    <div className="w-8 h-8 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-[#627EEA]">
+                                        ↓
                                     </div>
                                 </div>
 
-                                <div className="flex justify-center -my-9 relative z-10">
-                                    <div className="bg-white dark:bg-[#151525] border border-black/5 dark:border-white/10 rounded-full p-2.5 shadow-lg text-[#0052FF] cursor-pointer hover:scale-110 transition-transform">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5V19M19 12l-7 7-7-7" /></svg>
-                                    </div>
-                                </div>
-
-                                <div className="input-container">
-                                    <div className="text-[13px] font-medium text-[#666666] mb-3">You receive</div>
+                                {/* Output */}
+                                <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                                    <div className="text-xs text-gray-500 mb-2">You receive</div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[28px] font-semibold">{depositAmount || '0'}</span>
-                                        <div className="flex items-center gap-2 bg-[#F0F2F5] dark:bg-white/5 rounded-full px-3 py-1.5">
-                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${activeTab === 'deposit' ? 'bg-[#F377BB]' : 'bg-[#0052FF]'}`}>{activeTab === 'deposit' ? 'j' : 'W'}</div>
-                                            <span className="text-sm font-semibold">{activeTab === 'deposit' ? 'jETHs' : 'cbWETH'}</span>
+                                        <span className="text-2xl font-semibold">{depositAmount || '0'}</span>
+                                        <div className="flex items-center gap-1.5 bg-white/5 rounded-full px-3 py-1.5">
+                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${activeTab === 'deposit' ? 'bg-[#F377BB]' : 'bg-[#627EEA]'}`}>
+                                                {activeTab === 'deposit' ? 'j' : 'Ξ'}
+                                            </div>
+                                            <span className="text-sm font-medium">{activeTab === 'deposit' ? 'jETHs' : 'WETH'}</span>
                                         </div>
                                     </div>
-                                    <div className="flex justify-between items-center mt-3 text-[13px] text-[#666666]">
-                                        <span>1 jETHs = {shareRatioDisplay} ETH</span>
-                                        {activeTab === 'deposit' && <a href="https://app.uniswap.org" target="_blank" className="text-[#0052FF] font-medium hover:underline">Get cbWETH →</a>}
+                                    <div className="text-xs text-gray-500 mt-2">1 jETHs = 1 WETH share</div>
+                                </div>
+
+                                {/* Action Button */}
+                                {isConnected ? (
+                                    <button
+                                        disabled={isLoading || !depositAmount}
+                                        onClick={activeTab === 'deposit' ? handleDeposit : handleWithdraw}
+                                        className="w-full py-4 bg-gradient-to-r from-[#627EEA] to-[#0052FF] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        {isLoading ? 'Processing...' : depositAmount ? (activeTab === 'deposit' ? 'Deposit' : 'Withdraw') : 'Enter an amount'}
+                                    </button>
+                                ) : (
+                                    <div className="flex justify-center">
+                                        <ConnectButton />
                                     </div>
-                                </div>
+                                )}
 
-                                <button disabled={isLoading || !depositAmount} onClick={activeTab === 'deposit' ? handleDeposit : handleWithdraw} className="btn-blue w-full mt-2">
-                                    {isLoading ? 'Processing...' : !address ? 'Connect Wallet' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-                                </button>
-
-                                <div className="flex justify-between px-1 attribution-text">
-                                    <span>Price by CoinGecko</span>
+                                {/* Info Row */}
+                                <div className="flex justify-between text-xs text-gray-500 px-1">
                                     <span>Min. deposit: 0.01 ETH</span>
+                                    <span>✓ Yearn V3</span>
+                                    <span>✓ No Lock-ups</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-8 grid grid-cols-2 gap-4">
-                            <div className="card p-6 text-center">
-                                <div className="text-[12px] font-medium text-[#666666] uppercase tracking-wider mb-1">Total Value Locked</div>
-                                <div className="text-[20px] font-bold">{totalHoldings.toFixed(2)} ETH</div>
-                                <div className="text-[12px] font-semibold text-[#10B981] mt-1">Growth: +1.2%</div>
+                        {/* Stats Bar */}
+                        <div className="mt-4 bg-[#111] border border-white/10 rounded-xl p-4 flex justify-between items-center text-center">
+                            <div>
+                                <div className="text-xs text-gray-500 uppercase tracking-wider">TVL</div>
+                                <div className="text-white font-bold">{totalHoldings.toFixed(2)}</div>
                             </div>
-                            <div className="card p-6 text-center">
-                                <div className="text-[12px] font-medium text-[#666666] uppercase tracking-wider mb-1">Estimated APY</div>
-                                <div className="text-[20px] font-bold text-[#0052FF]">7.2% - 11.4%</div>
-                                <div className="text-[12px] font-medium text-[#666666] mt-1">Daily Comp.</div>
+                            <div>
+                                <div className="text-xs text-gray-500 uppercase tracking-wider">APY</div>
+                                <div className="text-[#10B981] font-bold">7-11%</div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500 uppercase tracking-wider">wstETH</div>
+                                <div className="text-white font-bold">{wstPercent.toFixed(0)}%</div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500 uppercase tracking-wider">cbETH</div>
+                                <div className="text-white font-bold">{cbethPercent.toFixed(0)}%</div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500 uppercase tracking-wider">rETH</div>
+                                <div className="text-white font-bold">{rethPercent.toFixed(0)}%</div>
                             </div>
                         </div>
 
-                        <div className="card mt-4 p-5 flex justify-between px-10">
-                            {[['wstETH', wstPercent], ['cbETH', cbethPercent], ['rETH', rethPercent]].map(([name, p], i) => (
-                                <div key={i} className="flex flex-col items-center">
-                                    <span className="text-[11px] font-medium text-[#666666] uppercase tracking-wider mb-1">{name as string}</span>
-                                    <span className="text-[14px] font-bold">{(p as number).toFixed(1)}%</span>
-                                </div>
-                            ))}
+                        {/* Status Row */}
+                        <div className="mt-2 text-center text-sm">
+                            <span className="inline-flex items-center gap-1.5 text-[#10B981]">
+                                <span className="w-2 h-2 bg-[#10B981] rounded-full animate-pulse"></span>
+                                Active
+                            </span>
+                            <span className="text-gray-500 ml-4">{strategyStatus?.stats?.rebalancesExecuted?.toString() || '0'} rebalances</span>
                         </div>
 
-                        <footer className="mt-20 mb-12 flex flex-col items-center gap-10">
-                            <div className="flex gap-8">
-                                {[['Contract', isMainnet ? `https://etherscan.io/address/${strategyAddress}` : `https://sepolia.etherscan.io/address/${strategyAddress}`], ['Audit', 'https://github.com/Jubilee-Protocol/jETHs-on-Base/blob/main/docs/JETHS_AUDIT_REPORT.md'], ['FAQ', 'https://docs.jeths.xyz/faq'], ['Docs', 'https://docs.jeths.xyz']].map(([name, url], i) => (
-                                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="text-[12px] font-medium text-[#666666] hover:text-[#0052FF] uppercase tracking-wider flex items-center gap-1.5 transition-colors">
-                                        {name} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M7 17L17 7M17 7H7M17 7V17" /></svg>
-                                    </a>
-                                ))}
-                            </div>
-                            <div className="text-[11px] font-medium text-[#9CA3AF] text-center uppercase tracking-[0.2em] leading-relaxed">
-                                <div>2026 © Jubilee Protocol · Sepolia Testnet</div>
-                                <div className="mt-2">Governed by Hundredfold Foundation</div>
-                            </div>
-                        </footer>
+                        {/* Footer Links */}
+                        <div className="mt-8 flex justify-center gap-8 text-sm">
+                            <a href={`https://sepolia.etherscan.io/address/${strategyAddress}`} target="_blank" className="text-gray-500 hover:text-white transition-colors">Contract ↗</a>
+                            <a href="https://docs.jubilee.fi" target="_blank" className="text-gray-500 hover:text-white transition-colors">Docs ↗</a>
+                            <a href="https://jubilee.fi" target="_blank" className="text-gray-500 hover:text-white transition-colors">Jubilee ↗</a>
+                        </div>
+
+                        {/* Copyright */}
+                        <div className="mt-8 text-center text-xs text-gray-600 pb-8">
+                            2026 © Jubilee Labs
+                        </div>
                     </div>
                 </div>
             </main>
