@@ -7,7 +7,7 @@
 > A passive, diversified liquid staking strategy that automatically rebalances across Ethereum's top LST protocols while capturing arbitrage opportunities.
 
 **Website**: https://jeths.xyz  
-**App**: https://mint.jeths.xyz  
+**App**: https://mint.jeths.xyz (Pending)
 **Contract**: [`0x08Bc3F12Dd327739B3BC613A6640aCa3B67D5Be6`](https://sepolia.etherscan.io/address/0x08Bc3F12Dd327739B3BC613A6640aCa3B67D5Be6) *(Testnet)*  
 **Status**: 🚀 **Live on Sepolia Testnet** — Preparing for Mainnet
 
