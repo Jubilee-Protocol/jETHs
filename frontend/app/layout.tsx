@@ -4,6 +4,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://mint.jeths.xyz'),
     title: 'jETHs | Liquid Staking Index on Ethereum',
     description: 'The first diversified LST Index Fund on Ethereum. Earn yield on wstETH, cbETH, and rETH via Yearn V3.',
     keywords: ['jETHs', 'Ethereum', 'LST', 'Index Fund', 'wstETH', 'cbETH', 'rETH', 'DeFi', 'Yearn'],
@@ -14,11 +15,11 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'jETHs | Liquid Staking Index on Ethereum',
         description: 'The first diversified LST Index Fund on Ethereum. Earn 3-5% APY on diversified ETH exposure.',
-        url: 'https://jeths.jubilee.xyz',
+        url: 'https://mint.jeths.xyz',
         siteName: 'jETHs',
         images: [
             {
-                url: 'https://jeths.jubilee.xyz/og-image.png',
+                url: '/og-image.png',
                 width: 625,
                 height: 625,
                 alt: 'jETHs - Ethereum Index Fund',
@@ -31,19 +32,19 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'jETHs | Liquid Staking Index on Ethereum',
         description: 'The first diversified LST Index Fund on Ethereum. Earn 3-5% APY on diversified ETH exposure.',
-        images: ['https://jeths.jubilee.xyz/og-image.png'],
+        images: ['/og-image.png'],
     },
     other: {
         'fc:miniapp': JSON.stringify({
             version: 'next',
-            imageUrl: 'https://jeths.jubilee.xyz/og-image.png',
+            imageUrl: 'https://mint.jeths.xyz/og-image.png',
             button: {
                 title: 'Open jETHs',
                 action: {
                     type: 'launch_frame',
-                    url: 'https://jeths.jubilee.xyz',
+                    url: 'https://mint.jeths.xyz',
                     name: 'jETHs - Ethereum Index',
-                    splashImageUrl: 'https://jeths.jubilee.xyz/splash.png',
+                    splashImageUrl: 'https://mint.jeths.xyz/splash.png',
                     splashBackgroundColor: '#0a0a1a'
                 }
             }
