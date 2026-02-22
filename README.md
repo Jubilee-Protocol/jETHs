@@ -2,7 +2,7 @@
 
 [![Built on Ethereum](https://img.shields.io/badge/Built%20on-Ethereum-3C3C3D)](https://ethereum.org)
 [![Powered by Yearn](https://img.shields.io/badge/Powered%20by-Yearn%20V3-blue)](https://yearn.fi)
-[![App](https://img.shields.io/badge/App-mint.jeths.xyz-green)](https://mint.jeths.xyz)
+[![Donate Crypto](https://img.shields.io/badge/Donate-Crypto-f7931a?logo=bitcoin&logoColor=white)](https://commerce.coinbase.com/checkout/122a2979-e559-44b9-bb9d-2ff0c6a3025b)
 
 > A passive, diversified liquid staking strategy that automatically rebalances across Ethereum's top LST protocols while capturing arbitrage opportunities.
 
